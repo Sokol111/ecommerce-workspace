@@ -1,0 +1,17 @@
+# Nested repositories (each has its own git)
+ecommerce-admin-ui/
+ecommerce-catalog-service/
+ecommerce-catalog-service-api/
+ecommerce-category-query-service/
+ecommerce-category-query-service-api/
+ecommerce-commons/
+ecommerce-image-service/
+ecommerce-image-service-api/
+ecommerce-infrastructure/
+ecommerce-platform-ui/
+ecommerce-product-query-service/
+ecommerce-product-query-service-api/
+ecommerce-tenant-service/
+ecommerce-tenant-service-api/
+ecommerce-ui/
+ecommerce-ui-nextjs/
