@@ -1,0 +1,169 @@
+{
+	"folders": [
+		{
+			"name": "📁 ecommerce (root)",
+			"path": "."
+		},
+		{
+			"name": "ecommerce-commons",
+			"path": "ecommerce-commons"
+		},
+		{
+			"name": "ecommerce-platform-ui",
+			"path": "ecommerce-platform-ui"
+		},
+		{
+			"name": "ecommerce-admin-ui",
+			"path": "ecommerce-admin-ui"
+		},
+		{
+			"name": "ecommerce-ui",
+			"path": "ecommerce-ui"
+		},
+		{
+			"name": "ecommerce-infrastructure",
+			"path": "ecommerce-infrastructure"
+		},
+		{
+			"name": "ecommerce-product-query-service-api",
+			"path": "ecommerce-product-query-service-api"
+		},
+		{
+			"name": "ecommerce-product-query-service",
+			"path": "ecommerce-product-query-service"
+		},
+		{
+			"name": "ecommerce-category-query-service-api",
+			"path": "ecommerce-category-query-service-api"
+		},
+		{
+			"name": "ecommerce-category-query-service",
+			"path": "ecommerce-category-query-service"
+		},
+		{
+			"name": "ecommerce-image-service-api",
+			"path": "ecommerce-image-service-api"
+		},
+		{
+			"name": "ecommerce-image-service",
+			"path": "ecommerce-image-service"
+		},
+		{
+			"name": "ecommerce-catalog-service-api",
+			"path": "ecommerce-catalog-service-api"
+		},
+		{
+			"name": "ecommerce-catalog-service",
+			"path": "ecommerce-catalog-service"
+		},
+		{
+			"name": "ecommerce-tenant-service-api",
+			"path": "ecommerce-tenant-service-api"
+		},
+		{
+			"name": "ecommerce-tenant-service",
+			"path": "ecommerce-tenant-service"
+		},
+		{
+			"path": "ecommerce-workspace"
+		}
+	],
+	"settings": {
+		// === ЗАГАЛЬНІ ===
+		"editor.formatOnSave": true,
+		"files.autoSave": "onFocusChange",
+
+		// === GO ===
+		"go.goroot": "/usr/local/go",
+		"go.alternateTools": {
+			"go": "/usr/local/go/bin/go"
+		},
+		"go.toolsManagement.autoUpdate": true,
+		"go.toolsEnvVars": {
+			"CGO_ENABLED": "1",
+			"GOWORK": "/home/ihsokolo/projects/ecommerce/go.work",
+			"PATH": "/usr/local/go/bin:/home/ihsokolo/go/bin:/usr/bin:/bin",
+			"GOROOT": "/usr/local/go"
+		},
+		"terminal.integrated.env.linux": {
+			"PATH": "/usr/local/go/bin:/home/ihsokolo/go/bin:/usr/bin:/bin",
+			"GOROOT": "/usr/local/go"
+		},
+		"go.delveConfig": {
+			"dlvToolPath": "/home/ihsokolo/go/bin/dlv"
+		},
+		"gopls": {
+			"ui.semanticTokens": true
+		},
+		"[go]": {
+			"editor.defaultFormatter": "golang.go"
+		},
+
+		// === TYPESCRIPT / REACT / NEXT.JS ===
+		"[typescript][typescriptreact][javascript][javascriptreact]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "explicit"
+		},
+		"eslint.validate": [
+			"javascript",
+			"javascriptreact",
+			"typescript",
+			"typescriptreact"
+		],
+		"eslint.workingDirectories": [{ "mode": "auto" }],
+		"typescript.preferences.importModuleSpecifier": "non-relative",
+		"typescript.updateImportsOnFileMove.enabled": "always",
+		"typescript.tsdk": "node_modules/typescript/lib",
+
+		// === PRETTIER ===
+		"prettier.singleQuote": true,
+		"prettier.trailingComma": "es5",
+		"prettier.semi": true,
+		"prettier.requireConfig": true,
+
+		// === TAILWIND CSS ===
+		"tailwindCSS.emmetCompletions": true,
+		"tailwindCSS.experimental.classRegex": [
+			["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^'\"`]*)(?:'|\"|`)"],
+			["cva\\(([^)]*)\\)", "(?:'|\"|`)([^'\"`]*)(?:'|\"|`)"],
+			"tw`([^`]*)`"
+		],
+		"css.lint.unknownAtRules": "ignore",
+
+		// === PATH INTELLISENSE ===
+		"path-intellisense.mappings": {
+			"@": "${workspaceFolder}/src"
+		},
+
+		// === YAML (для Helm templates) ===
+		"[yaml]": {
+			"editor.formatOnSave": false
+		},
+
+		// === NPM ===
+		"npm.enableScriptExplorer": true,
+
+		// === ПОШУК / ВИКЛЮЧЕННЯ ===
+		"files.exclude": {
+			"ecommerce-*": true,
+			"**/.next": true
+		},
+		"search.exclude": {
+			"**/.next": true,
+			"**/node_modules": true
+		},
+		"window.zoomLevel": -0.3,
+		"editor.fontSize": 13,
+		"editor.fontFamily": "JetBrains Mono, Fira Code, monospace",
+		"editor.fontLigatures": true,
+		"editor.lineHeight": 1.6,
+		"editor.fontWeight": "400",
+		"editor.letterSpacing": 0.5,
+		"editor.renderWhitespace": "none",
+		"editor.cursorBlinking": "smooth",
+		"workbench.colorTheme": "Dark+"
+	}
+}
