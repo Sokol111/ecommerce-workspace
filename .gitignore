@@ -1,5 +1,8 @@
 # Nested repositories (each has its own git)
 ecommerce-admin-ui/
+
+# Go workspace checksum (regenerated automatically)
+go.work.sum
 ecommerce-catalog-service/
 ecommerce-catalog-service-api/
 ecommerce-category-query-service/
