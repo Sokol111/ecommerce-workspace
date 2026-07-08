@@ -1,0 +1,21 @@
+.devcontainer/devcontainer.json
+  s_40f70c8dd38e42::t_47e949d3260121 19-20,32-33
+.mcp.json
+  s_40f70c8dd38e42::t_c05de3955b0b77 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "dcec12e847922a140bbd850496018c28b7245d1e",
+  "prompts": {},
+  "sessions": {
+    "s_40f70c8dd38e42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bed4802d-c593-4b64-9c98-de51c8f81f07",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
