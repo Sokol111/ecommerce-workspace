@@ -1,0 +1,8 @@
+**/.git
+**/node_modules
+**/.nuxt
+**/.output
+**/bin
+**/coverage.out
+go.work.sum
+!ecommerce-infrastructure/environments/local/certs/ca-certificates.crt
