@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := help
+
 GIT_BASE ?= git@github.com:Sokol111
 
 REPOS := \
@@ -42,6 +44,20 @@ update:
 status:
 	@$(foreach repo,$(REPOS),\
 		echo "=== $(repo) ===" && git -C $(repo) status --short --branch;)
+
+.PHONY: help
+## Show this help message
+help:
+	@echo "Available targets:"
+	@awk 'BEGIN { comment = "" } \
+		/^## / { comment = substr($$0, 4); next } \
+		/^[a-zA-Z0-9_-]+:/ { \
+			if (comment != "") { \
+				gsub(/:.*$$/, "", $$1); \
+				printf "  \033[36m%-24s\033[0m %s\n", $$1, comment; \
+				comment = ""; \
+			} \
+		}' $(MAKEFILE_LIST)
 
 # --- Dev container (isolated Claude Code sandbox) ---
 #
