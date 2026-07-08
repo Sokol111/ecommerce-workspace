@@ -1,0 +1,33 @@
+.devcontainer/devcontainer-lock.json
+  s_40f70c8dd38e42::t_1cd50c4ad7265a 1-9
+.dockerignore
+  s_40f70c8dd38e42::t_86b4f1f95ab3c5 1-8
+CLAUDE.md
+  s_00dd3ef4f21679::t_0878914e480aa9 1-130
+bin/claude-box
+  s_40f70c8dd38e42::t_fc3106d871131e 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "2a421badb92302c9e69dafd6558fae59789295a7",
+  "prompts": {},
+  "sessions": {
+    "s_00dd3ef4f21679": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4923812d-31e2-429f-b3ec-0c8d37c3a409",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    },
+    "s_40f70c8dd38e42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bed4802d-c593-4b64-9c98-de51c8f81f07",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
