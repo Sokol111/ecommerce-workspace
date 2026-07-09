@@ -26,6 +26,26 @@ list of api dirs via the `API_DEPS` build arg (see `api_deps` in the local `Tilt
 the Dockerfile `go work use`s each copied api module. So local api changes flow into the
 image through the workspace too, exactly like local `make run`.
 
+## Where Claude Code runs
+
+Claude Code for this workspace runs in one of two places — check which one you're in before
+assuming host tooling (k3d, Tilt, docker-compose) is reachable:
+
+- **WSL host** (`/home/ihsokolo/projects/ecommerce`) — normal interactive use, prompts for
+  permission as usual. This is where `make dev`/`make up` (k3d + Tilt) must be run; the local
+  cluster is host-only and is NOT reachable from the devcontainer.
+- **Dev container** (`/workspaces/ecommerce`, see `.devcontainer/`) — runs in autonomous
+  bypass mode (`permissions.defaultMode: bypassPermissions`), started via `make claude` from
+  the host. It exists to sandbox the bypass agent away from host secrets (WSL-stored tokens,
+  sops secrets): its `~/.claude` is a named Docker volume, not a bind-mount of the host's, so
+  it never sees host credentials or the host's global MCP servers/`~/.claude.json`. The
+  workspace itself (all `ecommerce-*` repos) is bind-mounted, not copied, so edits are live in
+  both places instantly. Scope inside the container is toolchain + tests only (build, test,
+  lint, generate, `go.work`) via Docker-in-Docker for testcontainers — no k3d/Tilt stack there.
+
+To tell which one you're in: `pwd` will show `/workspaces/ecommerce` in the container vs
+`/home/ihsokolo/projects/ecommerce` on the host; `[ -f /.dockerenv ]` is also a reliable check.
+
 ## Component map
 
 Services (Go), each paired with an `-api` contract repo:
