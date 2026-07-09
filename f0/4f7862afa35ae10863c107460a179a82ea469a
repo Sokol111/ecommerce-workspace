@@ -1,0 +1,19 @@
+README.md
+  s_688dafef2e845d::t_0b6ac7890c083f 3-8,66-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "f04f7862afa35ae10863c107460a179a82ea469a",
+  "prompts": {},
+  "sessions": {
+    "s_688dafef2e845d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bdd2b49-0233-422e-8be6-2e05cff93b16",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
