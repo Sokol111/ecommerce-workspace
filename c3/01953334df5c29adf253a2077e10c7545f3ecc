@@ -1,0 +1,21 @@
+CLAUDE.md
+  s_0036f19180f99a::t_5e5661cbd752a6 63-67,97-115
+README.md
+  s_0036f19180f99a::t_8dac7894fc0df3 7,42,104-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "c301953334df5c29adf253a2077e10c7545f3ecc",
+  "prompts": {},
+  "sessions": {
+    "s_0036f19180f99a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fbc6500a-b4f2-4a24-b3f5-461ee8f832f2",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
