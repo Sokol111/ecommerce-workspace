@@ -1,6 +1,11 @@
 # ecommerce
 
-An event-driven, **CQRS** e-commerce platform built as a **multi-repo workspace** of Go
+A **multi-tenant SaaS e-commerce platform**: anyone can sign up at
+[`sokolshop.com`](https://sokolshop.com) and get their own online store. Each tenant is fully
+isolated — its data lives in its own dedicated database (suffixed with the tenant slug,
+`*_<tenant-slug>`) — while sharing a single centrally-hosted deployment.
+
+Under the hood it is an event-driven, **CQRS** system built as a **multi-repo workspace** of Go
 microservices and Nuxt/TypeScript UIs. This root repository is a coordination directory: it
 does not contain application code itself, but clones and ties together the independent
 `ecommerce-*` repositories, wires the Go services into a single `go.work` workspace, and hosts
@@ -58,7 +63,9 @@ Kafka event schemas under `<name>/events/v1/`, with generated Go and TypeScript 
 - **Dependency injection** via [`go.uber.org/fx`](https://github.com/uber-go/fx) modules.
 - **API contracts** are protobuf, generated with [`buf`](https://buf.build) — edit `.proto`
   and regenerate; never hand-edit `gen/`.
-- **Multi-tenancy** is pervasive; tenant context flows through every request.
+- **Multi-tenant SaaS.** Self-service sign-up provisions a new store per tenant. Tenancy is
+  pervasive — tenant context flows through every request, and each tenant's data is isolated in
+  its own dedicated database (named with the tenant slug, `*_<tenant-slug>`).
 - **Auth** is JWT validated against a JWKS endpoint (Logto locally).
 - **Observability** via OpenTelemetry (local Grafana/Prometheus/Tempo stack).
 
