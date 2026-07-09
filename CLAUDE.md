@@ -160,9 +160,13 @@ Services are exposed via Traefik at `*.127.0.0.1.nip.io`; Tilt dashboard at `loc
 
 ## Cross-cutting conventions
 
-- **Multi-tenancy is pervasive.** `ecommerce-commons/pkg/tenant` and `tenant-service-api`
-  modules are wired into every service's `main.go`. Tenant context flows through requests;
-  respect it in new repository queries and handlers.
+- **Multi-tenancy is pervasive, and database-per-tenant.** `ecommerce-commons/pkg/tenant` and
+  `tenant-service-api` modules are wired into every service's `main.go`. Tenant context flows
+  through requests; respect it in new repository queries and handlers. Tenant-scoped data lives
+  in a separate Mongo database per tenant, named `<base-db>_<tenant-slug>` (resolved per-request
+  from tenant context in `pkg/persistence/mongo/collection_provider.go`). Use
+  `mongo.NewTenantRepository` for tenant data; use `mongo.NewRepository` for collections that are
+  **not** tenant-scoped (e.g. the transactional `outbox`, which lives in the base database).
 - **Auth** is JWT validated against a JWKS endpoint (Logto locally). Config under `security.jwks`.
 - **Config** is YAML per service under `configs/` (e.g. `config.standalone.yaml`), overridable
   by env/`.env`. Covers `mongo`, `kafka`, `security`, `logger`, `observability`.
