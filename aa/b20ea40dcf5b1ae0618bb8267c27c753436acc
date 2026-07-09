@@ -1,0 +1,19 @@
+CLAUDE.md
+  s_40f70c8dd38e42::t_11991ec176471f 29-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "aab20ea40dcf5b1ae0618bb8267c27c753436acc",
+  "prompts": {},
+  "sessions": {
+    "s_40f70c8dd38e42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bed4802d-c593-4b64-9c98-de51c8f81f07",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
