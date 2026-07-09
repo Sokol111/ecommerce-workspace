@@ -1,0 +1,19 @@
+README.md
+  s_031c731a94d06f::t_91407011e3abd9 41-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "7650d99b81e6636b63714dde46146c7fb245f255",
+  "prompts": {},
+  "sessions": {
+    "s_031c731a94d06f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b0413d1-8529-4157-b716-574b8d420c0d",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
