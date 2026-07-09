@@ -1,0 +1,19 @@
+CLAUDE.md
+  s_688dafef2e845d::t_c6d93553c02d2f 163-169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "9e3c0bf1b7a262da9071e1d23b1c385ede9a0e17",
+  "prompts": {},
+  "sessions": {
+    "s_688dafef2e845d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bdd2b49-0233-422e-8be6-2e05cff93b16",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
