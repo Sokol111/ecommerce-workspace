@@ -60,8 +60,11 @@ Services (Go), each paired with an `-api` contract repo:
 Shared / support:
 - `ecommerce-commons` — shared Go library (`pkg/core`, `http`, `grpc`, `messaging`,
   `observability`, `persistence`, `security`, `tenant`, `testutil`). Wired as `fx` modules.
-- `ecommerce-infrastructure` — local dev stack (k3d + Tilt + docker-compose), Helm charts,
-  seeders (`cmd/seeder`, `cmd/logto-seed`).
+- `ecommerce-infrastructure` — deployment for both environments plus shared Helm charts and
+  seeders (`cmd/seeder`, `cmd/logto-seed`). `environments/local` is the local dev stack (k3d +
+  Tilt + docker-compose); `environments/production` is the real deployed environment (see
+  **Production** below). The `helm/` charts are shared by both — a chart change affects local
+  and prod alike.
 - `ecommerce-ui` (storefront), `ecommerce-admin-ui`, `ecommerce-platform-ui` — Nuxt apps.
 
 ## Architecture
@@ -90,6 +93,25 @@ rather than constructing it manually in `main.go`.
 `<name>/events/v1/`). `make generate` produces Go (`gen/go`, published as the Go module) and
 TypeScript (`gen/typescript`, consumed by the Nuxt UIs). **Edit `.proto` and regenerate — never
 hand-edit files under `gen/`.**
+
+## Production
+
+The live environment is a single **Hetzner VPS running k3s** (not k3d), namespaces `prod` +
+`observability`. It differs from local in that heavy dependencies are **managed external
+services** rather than self-hosted: MongoDB Atlas (not local Mongo), Cloudflare R2 (not MinIO),
+and Grafana Cloud via an Alloy DaemonSet (not the local Grafana stack). Redpanda, imgproxy,
+Logto, and Traefik + cert-manager run in-cluster.
+
+- **Deploys are automated CD**, not manual. A service release triggers the reusable
+  `.github/workflows/deploy.yml` (`workflow_call`), which `helm upgrade`s the chart into `prod`
+  using `environments/production/values/<service>.yaml`. The `make deploy-svc` target in
+  `environments/production/` is a manual fallback for hotfixes.
+- **kubectl requires an SSH tunnel** to the k3s API — there is no public API endpoint. Run
+  `make tunnel` (and `make kubeconfig` once) from `environments/production/`; kubeconfig lives
+  at `~/.kube/config-hetzner`. Ops helpers there: `make status`, `logs SVC=`, `restart SVC=`,
+  `seed TENANT_SLUG=`, `logto-seed`.
+- **Secrets are SOPS-encrypted** (`k8s/secrets.enc.yaml`); edit via `make secrets-edit`, apply
+  via `make setup-secrets`. Never commit decrypted secrets.
 
 ## Common commands
 

@@ -4,7 +4,7 @@ An event-driven, **CQRS** e-commerce platform built as a **multi-repo workspace*
 microservices and Nuxt/TypeScript UIs. This root repository is a coordination directory: it
 does not contain application code itself, but clones and ties together the independent
 `ecommerce-*` repositories, wires the Go services into a single `go.work` workspace, and hosts
-the local development environment.
+both the local and production environments.
 
 > For deep architecture and contributor guidance (used by AI agents and humans alike), see
 > [`CLAUDE.md`](CLAUDE.md).
@@ -39,7 +39,7 @@ service and its API contract is usually two commits in two repos.
 | `ecommerce-image-service` (+ `-api`) | Go service | Image upload/serving (MinIO + imgproxy). |
 | `ecommerce-tenant-service` (+ `-api`) | Go service | Multi-tenancy; consumed by every other service. |
 | `ecommerce-commons` | Go library | Shared modules: `core`, `http`, `grpc`, `messaging`, `observability`, `persistence`, `security`, `tenant`, `testutil`. |
-| `ecommerce-infrastructure` | Tooling | Local dev stack (k3d + Tilt + docker-compose), Helm charts, seeders. |
+| `ecommerce-infrastructure` | Tooling | Deployment for both environments: local dev stack (k3d + Tilt + docker-compose) and production (k3s), plus shared Helm charts and seeders. |
 | `ecommerce-ui` | Nuxt UI | Storefront. |
 | `ecommerce-admin-ui` | Nuxt UI | Admin console. |
 | `ecommerce-platform-ui` | Nuxt UI | Platform console. |
@@ -100,6 +100,23 @@ environment tools are installed.
 
    Services are exposed via Traefik at `*.127.0.0.1.nip.io`; the Tilt dashboard is at
    [`localhost:10350`](http://localhost:10350).
+
+## Production
+
+The live environment runs on a single **Hetzner VPS with k3s** (namespaces `prod` +
+`observability`). Heavy dependencies are **managed external services** rather than self-hosted:
+MongoDB Atlas, Cloudflare R2 (object storage), and Grafana Cloud (via an Alloy DaemonSet).
+Redpanda, imgproxy, Logto, and Traefik + cert-manager run in-cluster.
+
+- **Deploys are automated CD.** A service release triggers the reusable
+  `.github/workflows/deploy.yml`, which `helm upgrade`s the chart into `prod` with the values in
+  `environments/production/values/`. Manual `make deploy-svc` is a hotfix fallback.
+- **kubectl access is via SSH tunnel** to the k3s API (no public endpoint). From
+  `ecommerce-infrastructure/environments/production`, run `make tunnel` (and `make kubeconfig`
+  once); then `make status`, `logs SVC=`, `restart SVC=`, `seed TENANT_SLUG=`.
+- **Secrets are SOPS-encrypted** (`k8s/secrets.enc.yaml`); edit via `make secrets-edit`.
+
+See [`CLAUDE.md`](CLAUDE.md) and `ecommerce-infrastructure/environments/production/` for details.
 
 ## Common commands
 
