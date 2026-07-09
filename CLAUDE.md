@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Repository shape
 
 This is a **multi-repo workspace**, not a single project. The root is a coordination

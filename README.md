@@ -38,16 +38,16 @@ service and its API contract is usually two commits in two repos.
 
 | Repository | Kind | Responsibility |
 |---|---|---|
-| `ecommerce-catalog-service` (+ `-api`) | Go service | Write side / source of truth for products, categories, attributes. Emits domain events to Kafka. |
-| `ecommerce-product-query-service` (+ `-api`) | Go service | CQRS read model for products, built from catalog Kafka events. |
-| `ecommerce-category-query-service` (+ `-api`) | Go service | CQRS read model for categories. |
-| `ecommerce-image-service` (+ `-api`) | Go service | Image upload/serving (MinIO + imgproxy). |
-| `ecommerce-tenant-service` (+ `-api`) | Go service | Multi-tenancy; consumed by every other service. |
-| `ecommerce-commons` | Go library | Shared modules: `core`, `http`, `grpc`, `messaging`, `observability`, `persistence`, `security`, `tenant`, `testutil`. |
-| `ecommerce-infrastructure` | Tooling | Deployment for both environments: local dev stack (k3d + Tilt + docker-compose) and production (k3s), plus shared Helm charts and seeders. |
-| `ecommerce-ui` | Nuxt UI | Storefront. |
-| `ecommerce-admin-ui` | Nuxt UI | Admin console. |
-| `ecommerce-platform-ui` | Nuxt UI | Platform console. |
+| [`ecommerce-catalog-service`](https://github.com/Sokol111/ecommerce-catalog-service) (+ [`-api`](https://github.com/Sokol111/ecommerce-catalog-service-api)) | Go service | Write side / source of truth for products, categories, attributes. Emits domain events to Kafka. |
+| [`ecommerce-product-query-service`](https://github.com/Sokol111/ecommerce-product-query-service) (+ [`-api`](https://github.com/Sokol111/ecommerce-product-query-service-api)) | Go service | CQRS read model for products, built from catalog Kafka events. |
+| [`ecommerce-category-query-service`](https://github.com/Sokol111/ecommerce-category-query-service) (+ [`-api`](https://github.com/Sokol111/ecommerce-category-query-service-api)) | Go service | CQRS read model for categories. |
+| [`ecommerce-image-service`](https://github.com/Sokol111/ecommerce-image-service) (+ [`-api`](https://github.com/Sokol111/ecommerce-image-service-api)) | Go service | Image upload/serving (MinIO + imgproxy). |
+| [`ecommerce-tenant-service`](https://github.com/Sokol111/ecommerce-tenant-service) (+ [`-api`](https://github.com/Sokol111/ecommerce-tenant-service-api)) | Go service | Multi-tenancy; consumed by every other service. |
+| [`ecommerce-commons`](https://github.com/Sokol111/ecommerce-commons) | Go library | Shared modules: `core`, `http`, `grpc`, `messaging`, `observability`, `persistence`, `security`, `tenant`, `testutil`. |
+| [`ecommerce-infrastructure`](https://github.com/Sokol111/ecommerce-infrastructure) | Tooling | Deployment for both environments: local dev stack (k3d + Tilt + docker-compose) and production (k3s), plus shared Helm charts and seeders. |
+| [`ecommerce-ui`](https://github.com/Sokol111/ecommerce-ui) | Nuxt UI | Storefront. |
+| [`ecommerce-admin-ui`](https://github.com/Sokol111/ecommerce-admin-ui) | Nuxt UI | Admin console. |
+| [`ecommerce-platform-ui`](https://github.com/Sokol111/ecommerce-platform-ui) | Nuxt UI | Platform console. |
 
 Each `*-api` repo holds the protobuf contract for its service: RPCs under `<name>/v1/` and
 Kafka event schemas under `<name>/events/v1/`, with generated Go and TypeScript clients.
