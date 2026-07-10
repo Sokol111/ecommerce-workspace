@@ -1,0 +1,29 @@
+.claude/settings.json
+  s_b8fd242d76d97b::t_7bb8d0b5de1f46 2-9
+.mcp.json
+  s_f931054492bec8::t_d16eda1d4065c8 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "42cdc242fe1f1c5953d408edc5f37ed39bc5ac54",
+  "prompts": {},
+  "sessions": {
+    "s_b8fd242d76d97b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5bd04ab-9e67-4dca-96a5-72fbd40c7db4",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    },
+    "s_f931054492bec8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9508e5-8ba6-4fc2-a79e-b9687b70a086",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
