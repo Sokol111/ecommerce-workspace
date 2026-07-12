@@ -44,6 +44,17 @@ assuming host tooling (k3d, Tilt, docker-compose) is reachable:
 To tell which one you're in: `pwd` will show `/workspaces/ecommerce` in the container vs
 `/home/ihsokolo/projects/ecommerce` on the host; `[ -f /.dockerenv ]` is also a reliable check.
 
+**MCP secrets never live inside the workspace tree.** The container bind-mounts the workspace
+and its `vscode` user shares the host uid (1000) with passwordless sudo, so neither `.gitignore`
+nor file perms hide a secret placed under `ecommerce/` from the bypass agent. Real token values
+go in `~/.config/ecommerce/secrets.env` (host, `chmod 600`, OUTSIDE the mount); the committed
+`.envrc` only `source_env_if_exists`-es it via direnv on the host. See `.envrc.example`.
+`--disable-write` on an MCP limits its actions in the target system, NOT token exposure. The
+**GitHub MCP is a plugin** (remote HTTP) reading `GITHUB_PERSONAL_ACCESS_TOKEN` from env: the
+host uses a wider token, while the container gets a separate READ-ONLY one via the `containerEnv`
+remap `"GITHUB_PERSONAL_ACCESS_TOKEN": "${localEnv:GITHUB_TOKEN_DEVCONTAINER}"`, so the wider host
+token is never passed into bypass mode.
+
 ## Component map
 
 Services (Go), each paired with an `-api` contract repo:
@@ -172,3 +183,8 @@ Services are exposed via Traefik at `*.127.0.0.1.nip.io`; Tilt dashboard at `loc
   Grafana/Prometheus/Tempo stack.
 - **Versioning**: each repo has a `VERSION` file; a service consuming an `-api` pins it as a
   normal Go module version in `go.mod`, so API changes require release-then-bump.
+- **Repo-local Claude Code hooks** (`.claude/hooks/`, wired in `.claude/settings.json`) enforce
+  the rules above automatically: a PreToolUse guard **blocks** edits to `gen/go`, `gen/typescript`,
+  and `*.enc.yaml` (edit `.proto` + `make generate`, or `make secrets-edit` instead); PostToolUse
+  hooks auto-format touched files (`gofmt`/`goimports` for `.go`, the owning repo's `eslint --fix`
+  for `.ts/.vue/.js`). A block surfaces as an `exit 2` error with the correct path to take.

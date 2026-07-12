@@ -1,0 +1,23 @@
+# Template for the host .envrc. Copy to .envrc, then `direnv allow`:
+#   cp .envrc.example .envrc && direnv allow
+#
+# Secrets do NOT go here or in .envrc — they live outside the bind-mounted
+# workspace so the devcontainer can't read the file. Put real values in:
+#   ~/.config/ecommerce/secrets.env   (chmod 600), containing:
+#
+#     # Host GitHub MCP (may be wider — you approve each action interactively)
+#     export GITHUB_PERSONAL_ACCESS_TOKEN=""
+#
+#     # Devcontainer GitHub MCP (bypass mode) — keep READ-ONLY, fine-grained,
+#     # scoped to ecommerce-* repos. Remapped to GITHUB_PERSONAL_ACCESS_TOKEN
+#     # inside the container via devcontainer.json containerEnv.
+#     export GITHUB_TOKEN_DEVCONTAINER=""
+#
+#     # Grafana Cloud MCP server (host only — not consumed in the container)
+#     export GRAFANA_CLOUD_URL=""
+#     export GRAFANA_CLOUD_TOKEN=""
+#
+#     # npm/pnpm registry auth (read:packages only)
+#     export NODE_AUTH_TOKEN=""
+
+source_env_if_exists ~/.config/ecommerce/secrets.env

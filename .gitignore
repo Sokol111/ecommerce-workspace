@@ -3,6 +3,11 @@ ecommerce-admin-ui/
 
 # Go workspace checksum (regenerated automatically)
 go.work.sum
+
+# Per-project secrets (direnv). Keep the template, ignore the real file.
+.envrc
+.env
+!.envrc.example
 ecommerce-catalog-service/
 ecommerce-catalog-service-api/
 ecommerce-category-query-service/

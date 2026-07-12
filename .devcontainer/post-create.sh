@@ -26,6 +26,17 @@ if [ ! -L "${HOME}/.claude.json" ]; then
   echo "linked ~/.claude.json into volume"
 fi
 
+# --- Host plugins: mirror them at the path Claude expects.
+# The host's ~/.claude/plugins is bind-mounted read-only at ~/.claude-plugins-ro (see devcontainer.json).
+# rsync --delete makes the volume copy an exact mirror of the host on every rebuild (adds new,
+# updates changed, removes deleted) so the container never diverges from the host plugin set.
+# The volume copy is writable, so Claude can write its cache without touching the read-only host copy.
+if [ -d "${HOME}/.claude-plugins-ro" ]; then
+  mkdir -p "${HOME}/.claude/plugins"
+  rsync -a --delete "${HOME}/.claude-plugins-ro/" "${HOME}/.claude/plugins/"
+  echo "synced host plugins into volume"
+fi
+
 # --- Non-fatal toolchain checks.
 echo "--- toolchain ---"
 go version || true
