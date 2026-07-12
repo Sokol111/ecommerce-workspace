@@ -1,0 +1,19 @@
+.claude/settings.json
+  s_9f46163da3e72d::t_e28319e730c29f 38-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5d9eb6e4eb80ad588d7960361d2ab80d813c7d9e",
+  "prompts": {},
+  "sessions": {
+    "s_9f46163da3e72d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd54866d-e8ec-4fbd-8dba-49ba23dd103f",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
