@@ -1,0 +1,65 @@
+.claude/hooks/eslint-fix.sh
+  s_849b59a0fb84e2::t_ce6e128b6d2655 1-24
+.claude/hooks/gofmt.sh
+  s_849b59a0fb84e2::t_2e9756074b4d57 1-16
+.claude/hooks/guard-protected.sh
+  s_849b59a0fb84e2::t_6872ca7d49a34c 1-19
+.claude/settings.json
+  s_5db8b8ad1f5fc7::t_369949dafc69e7 8-46
+.claude/skills/new-service/SKILL.md
+  s_849b59a0fb84e2::t_99cfc39b1711e9 1-82
+.claude/skills/release-api/SKILL.md
+  s_849b59a0fb84e2::t_dfa7cce3aceb25 1-77
+.devcontainer/devcontainer.json
+  s_ce60040db4af0d::t_458d338ad422f4 33-34
+.devcontainer/post-create.sh
+  s_849b59a0fb84e2::t_be2b9c86b5b658 29-39
+.envrc.example
+  s_ce60040db4af0d::t_d3e3a5ffe5f2de 1-23
+.gitignore
+  s_ce60040db4af0d::t_991a6da117d1c0 6-10
+.mcp.json
+  s_2eebacaca825e4::t_daae9c568a1a45 2-20
+CLAUDE.md
+  s_ce60040db4af0d::t_2f6c00658acdc6 47-57,186-190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9e22ddb48499361d0a9755c8ac9a1b5e400f527b",
+  "prompts": {},
+  "sessions": {
+    "s_2eebacaca825e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d208b09b-736a-47ae-b3bb-5e09ba14bd60",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    },
+    "s_5db8b8ad1f5fc7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "416aef52-b781-4324-9b25-f13284a0f885",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    },
+    "s_849b59a0fb84e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97938b21-f43f-4fa1-99be-752d643e9a0c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    },
+    "s_ce60040db4af0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "266d880a-5281-41e5-8b93-bcb06612cafc",
+        "model": "unknown"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
