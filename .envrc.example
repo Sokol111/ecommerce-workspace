@@ -8,14 +8,27 @@
 #     # Host GitHub MCP (may be wider — you approve each action interactively)
 #     export GITHUB_PERSONAL_ACCESS_TOKEN=""
 #
-#     # Devcontainer GitHub MCP (bypass mode) — keep READ-ONLY, fine-grained,
+#     # Devcontainer GitHub MCP (autonomous mode) — keep READ-ONLY, fine-grained,
 #     # scoped to ecommerce-* repos. Remapped to GITHUB_PERSONAL_ACCESS_TOKEN
-#     # inside the container via devcontainer.json containerEnv.
+#     # inside the container via devcontainer.json containerEnv. This is not the
+#     # GitHub Copilot login: authenticate the isolated OpenCode state once with
+#     # `make opencode-auth-github`.
 #     export GITHUB_TOKEN_DEVCONTAINER=""
 #
 #     # Grafana Cloud MCP server (host only — not consumed in the container)
 #     export GRAFANA_CLOUD_URL=""
 #     export GRAFANA_CLOUD_TOKEN=""
+#
+#     # MongoDB MCP (host only). Use distinct read-only database users and
+#     # connection strings. Do not pass either into the devcontainer.
+#     export MDB_MCP_LOCAL_CONNECTION_STRING=""
+#     export MDB_MCP_PROD_CONNECTION_STRING=""
+#
+#     # Kubernetes MCP (host only). Point these to dedicated kubeconfigs whose
+#     # credentials are bound only to Kubernetes' built-in `view` ClusterRole.
+#     # Do not pass either kubeconfig into the devcontainer.
+#     export KUBECONFIG_MCP_LOCAL=""
+#     export KUBECONFIG_MCP_PROD=""
 #
 #     # npm/pnpm registry auth (read:packages only)
 #     export NODE_AUTH_TOKEN=""

@@ -59,11 +59,10 @@ help:
 			} \
 		}' $(MAKEFILE_LIST)
 
-# --- Dev container (isolated Claude Code sandbox) ---
+# --- Dev container (isolated OpenCode sandbox) ---
 #
-# Editing/k3d/Tilt stay native on the host; only Claude Code runs inside the
-# container (DinD-isolated from host secrets). See .devcontainer/ and
-# /home/ihsokolo/.claude/plans/container-dev-giggly-thimble.md for rationale.
+# Editing/k3d/Tilt stay native on the host; only OpenCode runs inside the
+# container (DinD-isolated from host secrets). See .devcontainer/ and AGENTS.md.
 
 WORKSPACE := $(CURDIR)
 CORP_CA := $(WORKSPACE)/ecommerce-infrastructure/environments/local/certs/ca-certificates.crt
@@ -73,18 +72,22 @@ DEVCONTAINER_LABEL := devcontainer.local_folder=$(WORKSPACE)
 # through the corporate proxy. NODE_EXTRA_CA_CERTS is exported for every target below.
 export NODE_EXTRA_CA_CERTS := $(CORP_CA)
 
-.PHONY: devcontainer-up claude devcontainer-exec devcontainer-stop devcontainer-status \
+
+.PHONY: devcontainer-up opencode opencode-auth-github devcontainer-exec devcontainer-stop devcontainer-status \
 	devcontainer-logs devcontainer-rebuild devcontainer-clean
 
 ## Build (if needed) and start the dev container
 devcontainer-up:
-	@: $${ANTHROPIC_AUTH_TOKEN:?ANTHROPIC_AUTH_TOKEN must be exported on the host}
 	@: $${NODE_AUTH_TOKEN:?NODE_AUTH_TOKEN must be exported on the host}
 	devcontainer up --workspace-folder $(WORKSPACE)
 
-## Run Claude Code inside the dev container (interactive; pass ARGS="-p '...'" for one-shot)
-claude: devcontainer-up
-	devcontainer exec --workspace-folder $(WORKSPACE) claude $(ARGS)
+## Run OpenCode inside the dev container (autonomous; pass ARGS="run '...'" for one-shot)
+opencode: devcontainer-up
+	devcontainer exec --workspace-folder $(WORKSPACE) opencode --auto $(ARGS)
+
+## Authenticate OpenCode with GitHub Copilot inside the isolated container volume
+opencode-auth-github: devcontainer-up
+	devcontainer exec --workspace-folder $(WORKSPACE) opencode auth login --provider github
 
 ## Run an arbitrary command inside the dev container, e.g. `make devcontainer-exec CMD="go build ./..."`
 devcontainer-exec: devcontainer-up
@@ -104,13 +107,12 @@ devcontainer-logs:
 
 ## Force a full rebuild of the dev container image (config or Dockerfile changed)
 devcontainer-rebuild:
-	@: $${ANTHROPIC_AUTH_TOKEN:?ANTHROPIC_AUTH_TOKEN must be exported on the host}
 	@: $${NODE_AUTH_TOKEN:?NODE_AUTH_TOKEN must be exported on the host}
 	devcontainer up --workspace-folder $(WORKSPACE) --remove-existing-container
 
-## Remove the dev container AND its named volumes (chat history, DinD state) — irreversible
+## Remove the dev container AND its named volumes (OpenCode state, DinD state) - irreversible
 devcontainer-clean:
 	@docker stop $$(docker ps --filter "label=$(DEVCONTAINER_LABEL)" -q) 2>/dev/null || true
 	@docker rm $$(docker ps -a --filter "label=$(DEVCONTAINER_LABEL)" -q) 2>/dev/null || true
-	@docker volume rm ecommerce-claude-home 2>/dev/null || true
+	@docker volume rm ecommerce-opencode-data 2>/dev/null || true
 	@docker volume ls --format '{{.Name}}' | grep '^dind-var-lib-docker-' | xargs -r docker volume rm 2>/dev/null || true

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      }
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "mongodb-local": {
+      "type": "local",
+      "command": ["npx", "-y", "mongodb-mcp-server@latest", "--readOnly"],
+      "environment": {
+        "MDB_MCP_CONNECTION_STRING": "{env:MDB_MCP_LOCAL_CONNECTION_STRING}"
+      }
+    },
+    "mongodb-prod": {
+      "type": "local",
+      "command": ["npx", "-y", "mongodb-mcp-server@latest", "--readOnly"],
+      "environment": {
+        "MDB_MCP_CONNECTION_STRING": "{env:MDB_MCP_PROD_CONNECTION_STRING}"
+      }
+    },
+    "kubernetes-local": {
+      "type": "local",
+      "command": ["npx", "-y", "kubernetes-mcp-server@latest", "--read-only"],
+      "environment": {
+        "KUBECONFIG": "{env:KUBECONFIG_MCP_LOCAL}"
+      }
+    },
+    "kubernetes-prod": {
+      "type": "local",
+      "command": ["npx", "-y", "kubernetes-mcp-server@latest", "--read-only"],
+      "environment": {
+        "KUBECONFIG": "{env:KUBECONFIG_MCP_PROD}"
+      }
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest", "--headless"]
+    },
+    "redpanda-local": {
+      "type": "local",
+      "command": ["npx", "-y", "@confluentinc/mcp-confluent", "--config", ".opencode/redpanda-local.yaml", "--allow-tools", "list-topics,consume-messages,list-consumer-groups,describe-consumer-group,get-consumer-group-lag,get-partition-offsets,get-topic-config"],
+      "environment": {
+        "DO_NOT_TRACK": "true"
+      }
+    },
+    "redpanda-prod": {
+      "type": "local",
+      "command": ["npx", "-y", "@confluentinc/mcp-confluent", "--config", ".opencode/redpanda-prod.yaml", "--allow-tools", "list-topics,consume-messages,list-consumer-groups,describe-consumer-group,get-consumer-group-lag,get-partition-offsets,get-topic-config"],
+      "environment": {
+        "DO_NOT_TRACK": "true"
+      }
+    },
+    "grafana-local": {
+      "type": "local",
+      "command": ["mcp-grafana", "--disable-write"],
+      "environment": {
+        "GRAFANA_URL": "http://localhost:3000",
+        "GRAFANA_USERNAME": "admin",
+        "GRAFANA_PASSWORD": "admin"
+      }
+    },
+    "grafana-cloud": {
+      "type": "local",
+      "command": ["mcp-grafana", "--disable-write"],
+      "environment": {
+        "GRAFANA_URL": "{env:GRAFANA_CLOUD_URL}",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_CLOUD_TOKEN}"
+      }
+    }
+  }
+}

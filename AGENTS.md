@@ -24,36 +24,49 @@ list of api dirs via the `API_DEPS` build arg (see `api_deps` in the local `Tilt
 the Dockerfile `go work use`s each copied api module. So local api changes flow into the
 image through the workspace too, exactly like local `make run`.
 
+## Nested repositories
+
+Before reading, editing, testing, or running Git commands in an `ecommerce-*` repository, read
+that repository's `AGENTS.md` if it exists. Its instructions apply in addition to this
+workspace-level file.
+
+Use the root `Makefile` as the authoritative list of workspace repositories. Run Git commands
+from the relevant nested repository, never from the workspace root.
+
 ## Execution environment
 
-Claude Code for this workspace runs in one of two places — check which one you're in before
+OpenCode for this workspace runs in one of two places. Check which one you're in before
 assuming host tooling (k3d, Tilt, docker-compose) is reachable:
 
 - **WSL host** (`/home/ihsokolo/projects/ecommerce`) — normal interactive use, prompts for
   permission as usual. This is where `make dev`/`make up` (k3d + Tilt) must be run; the local
   cluster is host-only and is NOT reachable from the devcontainer.
-- **Dev container** (`/workspaces/ecommerce`, see `.devcontainer/`) — runs in autonomous
-  bypass mode (`permissions.defaultMode: bypassPermissions`), started via `make claude` from
-  the host. It exists to sandbox the bypass agent away from host secrets (WSL-stored tokens,
-  sops secrets): its `~/.claude` is a named Docker volume, not a bind-mount of the host's, so
-  it never sees host credentials or the host's global MCP servers/`~/.claude.json`. The
-  workspace itself (all `ecommerce-*` repos) is bind-mounted, not copied, so edits are live in
-  both places instantly. Scope inside the container is toolchain + tests only (build, test,
-  lint, generate, `go.work`) via Docker-in-Docker for testcontainers — no k3d/Tilt stack there.
+- **Dev container** (`/workspaces/ecommerce`, see `.devcontainer/`) — starts via
+  `make opencode` and uses OpenCode's `--auto` mode. It auto-approves actions that are not
+  explicitly denied, while preserving explicit deny rules. It exists to sandbox the autonomous
+  agent away from host secrets (WSL-stored tokens, SOPS secrets): its OpenCode state is a named
+  Docker volume, not a bind-mount of the host's, so it never sees host credentials or global
+  OpenCode state. Authenticate its GitHub Copilot account once with `make opencode-auth-github`;
+  the OAuth credential remains only in that volume. The workspace itself (all `ecommerce-*`
+  repos) is bind-mounted, not copied, so edits are live in both places instantly. Scope inside
+  the container is toolchain + tests only (build, test, lint, generate, `go.work`) via
+  Docker-in-Docker for testcontainers - no k3d/Tilt stack there.
 
 To tell which one you're in: `pwd` will show `/workspaces/ecommerce` in the container vs
 `/home/ihsokolo/projects/ecommerce` on the host; `[ -f /.dockerenv ]` is also a reliable check.
 
 **MCP secrets never live inside the workspace tree.** The container bind-mounts the workspace
 and its `vscode` user shares the host uid (1000) with passwordless sudo, so neither `.gitignore`
-nor file perms hide a secret placed under `ecommerce/` from the bypass agent. Real token values
+nor file perms hide a secret placed under `ecommerce/` from the autonomous agent. Real token values
 go in `~/.config/ecommerce/secrets.env` (host, `chmod 600`, OUTSIDE the mount); the committed
 `.envrc` only `source_env_if_exists`-es it via direnv on the host. See `.envrc.example`.
 `--disable-write` on an MCP limits its actions in the target system, NOT token exposure. The
-**GitHub MCP is a plugin** (remote HTTP) reading `GITHUB_PERSONAL_ACCESS_TOKEN` from env: the
-host uses a wider token, while the container gets a separate READ-ONLY one via the `containerEnv`
-remap `"GITHUB_PERSONAL_ACCESS_TOKEN": "${localEnv:GITHUB_TOKEN_DEVCONTAINER}"`, so the wider host
-token is never passed into bypass mode.
+**GitHub MCP** is configured in `.opencode/opencode.json` and reads
+`GITHUB_PERSONAL_ACCESS_TOKEN` from env: the host uses a wider token, while the container gets a
+separate READ-ONLY one via the `containerEnv` remap
+`"GITHUB_PERSONAL_ACCESS_TOKEN": "${localEnv:GITHUB_TOKEN_DEVCONTAINER}"`, so the wider host token
+is never passed into the container. This MCP token is separate from the container's GitHub Copilot
+OAuth credential, which stays in the isolated OpenCode state volume.
 
 ## Component map
 
@@ -183,8 +196,8 @@ Services are exposed via Traefik at `*.127.0.0.1.nip.io`; Tilt dashboard at `loc
   Grafana/Prometheus/Tempo stack.
 - **Versioning**: each repo has a `VERSION` file; a service consuming an `-api` pins it as a
   normal Go module version in `go.mod`, so API changes require release-then-bump.
-- **Repo-local Claude Code hooks** (`.claude/hooks/`, wired in `.claude/settings.json`) enforce
-  the rules above automatically: a PreToolUse guard **blocks** edits to `gen/go`, `gen/typescript`,
-  and `*.enc.yaml` (edit `.proto` + `make generate`, or `make secrets-edit` instead); PostToolUse
-  hooks auto-format touched files (`gofmt`/`goimports` for `.go`, the owning repo's `eslint --fix`
-  for `.ts/.vue/.js`). A block surfaces as an `exit 2` error with the correct path to take.
+- **Repo-local OpenCode plugin** (`.opencode/plugins/workspace-guards.js`) enforces the rules
+  above automatically: it blocks edits to `gen/go`, `gen/typescript`, and `*.enc.yaml` (edit
+  `.proto` + `make generate`, or use `make secrets-edit` instead), then formats touched files
+  with `gofmt`/`goimports` for `.go` and the owning UI repository's `eslint --fix` for
+  `.ts`/`.tsx`/`.vue`/`.js`/`.mjs`.

@@ -12,7 +12,7 @@ does not contain application code itself, but clones and ties together the indep
 both the local and production environments.
 
 > For deep architecture and contributor guidance (used by AI agents and humans alike), see
-> [`CLAUDE.md`](CLAUDE.md).
+> [`AGENTS.md`](AGENTS.md).
 
 ## Repository layout
 
@@ -69,7 +69,7 @@ Kafka event schemas under `<name>/events/v1/`, with generated Go and TypeScript 
 - **Auth** is JWT validated against a JWKS endpoint (Logto locally).
 - **Observability** via OpenTelemetry (local Grafana/Prometheus/Tempo stack).
 
-See [`CLAUDE.md`](CLAUDE.md) for the full architecture deep-dive.
+See [`AGENTS.md`](AGENTS.md) for the full architecture deep-dive.
 
 ## Prerequisites
 
@@ -79,6 +79,12 @@ See [`CLAUDE.md`](CLAUDE.md) for the full architecture deep-dive.
 
 From `ecommerce-infrastructure/environments/local`, run `make tools-check` to verify the local
 environment tools are installed.
+
+## MCP Credentials
+
+For creating and rotating credentials used by the workspace MCP servers, see
+[`docs/mcp-credentials.md`](docs/mcp-credentials.md). Secrets must remain outside the workspace
+in `~/.config/ecommerce/secrets.env`.
 
 ## Quick start
 
@@ -123,7 +129,7 @@ Redpanda, imgproxy, Logto, and Traefik + cert-manager run in-cluster.
   once); then `make status`, `logs SVC=`, `restart SVC=`, `seed TENANT_SLUG=`.
 - **Secrets are SOPS-encrypted** (`k8s/secrets.enc.yaml`); edit via `make secrets-edit`.
 
-See [`CLAUDE.md`](CLAUDE.md) and `ecommerce-infrastructure/environments/production/` for details.
+See [`AGENTS.md`](AGENTS.md) and `ecommerce-infrastructure/environments/production/` for details.
 
 ## Common commands
 
@@ -154,7 +160,7 @@ pnpm lint                # eslint
 pnpm typecheck           # nuxt typecheck
 ```
 
-See [`CLAUDE.md`](CLAUDE.md) for the full command reference.
+See [`AGENTS.md`](AGENTS.md) for the full command reference.
 
 ## Release model
 
@@ -167,17 +173,23 @@ in an `-api` repo is visible to its consumers immediately, with no tag/release/`
 
 ## Dev container
 
-Claude Code can run in an isolated dev container (DinD-sandboxed away from host secrets),
+OpenCode can run in an isolated dev container (DinD-sandboxed away from host secrets),
 started from the host with:
 
 ```bash
-make claude              # build (if needed) + run Claude Code inside the container
+make opencode            # build (if needed) + run OpenCode inside the container
+```
+
+The first time, authenticate GitHub Copilot in the container's isolated OpenCode state:
+
+```bash
+make opencode-auth-github
 ```
 
 Editing, k3d, and Tilt stay native on the host; only the agent is sandboxed. See
-[`.devcontainer/`](.devcontainer/) and [`CLAUDE.md`](CLAUDE.md) for the rationale and details.
+[`.devcontainer/`](.devcontainer/) and [`AGENTS.md`](AGENTS.md) for the rationale and details.
 
 ## Further documentation
 
-- [`CLAUDE.md`](CLAUDE.md) — full architecture, conventions, and command reference.
+- [`AGENTS.md`](AGENTS.md) — full architecture, conventions, and command reference.
 - [`LICENSE`](LICENSE) — license terms.
