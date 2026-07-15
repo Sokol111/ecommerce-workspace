@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 ## Repository shape
 
@@ -24,7 +24,7 @@ list of api dirs via the `API_DEPS` build arg (see `api_deps` in the local `Tilt
 the Dockerfile `go work use`s each copied api module. So local api changes flow into the
 image through the workspace too, exactly like local `make run`.
 
-## Where Claude Code runs
+## Execution environment
 
 Claude Code for this workspace runs in one of two places — check which one you're in before
 assuming host tooling (k3d, Tilt, docker-compose) is reachable:
