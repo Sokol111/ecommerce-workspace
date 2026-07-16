@@ -26,10 +26,11 @@
 #
 #     # Kubernetes MCP (host only). `make init` or `make up` generates the local
 #     # admin kubeconfig at ~/.kube/mcp-local.kubeconfig. Production must use a
-#     # dedicated kubeconfig whose credentials are bound to `view` ClusterRole.
+#     # dedicated viewer kubeconfig generated with:
+#     #   cd ecommerce-infrastructure/environments/production && make mcp-kubeconfig
 #     # Do not pass either kubeconfig into the devcontainer.
 #     export KUBECONFIG_MCP_LOCAL="$HOME/.kube/mcp-local.kubeconfig"
-#     export KUBECONFIG_MCP_PROD=""
+#     export KUBECONFIG_MCP_PROD="$HOME/.kube/mcp-prod-viewer.kubeconfig"
 #
 #     # npm/pnpm registry auth (read:packages only)
 #     export NODE_AUTH_TOKEN=""
