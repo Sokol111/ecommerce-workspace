@@ -1,0 +1,30 @@
+{
+  "name": "ecommerce-workspace",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "runArgs": ["--privileged", "--init"],
+  "workspaceFolder": "/workspaces/ecommerce",
+  "mounts": [
+    "source=ecommerce-opencode-data,target=/home/vscode/.local/share/opencode,type=volume"
+  ],
+  "containerEnv": {
+    "GOFLAGS": "-mod=readonly",
+    "GOTOOLCHAIN": "local",
+    "NODE_EXTRA_CA_CERTS": "/etc/ssl/certs/ca-certificates.crt",
+    "NODE_AUTH_TOKEN": "${localEnv:NODE_AUTH_TOKEN}",
+    "CONTEXT7_API_KEY": "${localEnv:CONTEXT7_API_KEY}",
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "${localEnv:GITHUB_TOKEN_DEVCONTAINER}"
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh"
+}
