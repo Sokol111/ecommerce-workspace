@@ -1,5 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "lsp": {
+    "gopls": {
+      "command": ["gopls"],
+      "extensions": [".go"]
+    }
+  },
   "mcp": {
     "context7": {
       "type": "remote",

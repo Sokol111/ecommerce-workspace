@@ -19,9 +19,8 @@ REPOS := \
 	ecommerce-tenant-service-api \
 	ecommerce-ui
 
-.PHONY: setup update status
-
 ## Clone all repositories
+.PHONY: setup
 setup:
 	@$(foreach repo,$(REPOS),\
 		if [ -d "$(repo)" ]; then \
@@ -34,6 +33,7 @@ setup:
 	@echo "  code ecommerce.code-workspace"
 
 ## Pull latest changes in all repositories
+.PHONY: update
 update:
 	@$(foreach repo,$(REPOS),\
 		if [ -d "$(repo)" ]; then \
@@ -41,12 +41,18 @@ update:
 		fi;)
 
 ## Show git status for all repositories
+.PHONY: status
 status:
 	@$(foreach repo,$(REPOS),\
 		echo "=== $(repo) ===" && git -C $(repo) status --short --branch;)
 
-.PHONY: help
+## Synchronize workspace dependencies into module go.mod files
+.PHONY: work-sync
+work-sync:
+	go work sync
+
 ## Show this help message
+.PHONY: help
 help:
 	@echo "Available targets:"
 	@awk 'BEGIN { comment = "" } \
@@ -73,44 +79,50 @@ DEVCONTAINER_LABEL := devcontainer.local_folder=$(WORKSPACE)
 export NODE_EXTRA_CA_CERTS := $(CORP_CA)
 
 
-.PHONY: devcontainer-up opencode opencode-auth-github devcontainer-exec devcontainer-stop devcontainer-status \
-	devcontainer-logs devcontainer-rebuild devcontainer-clean
-
 ## Build (if needed) and start the dev container
+.PHONY: devcontainer-up
 devcontainer-up:
 	@: $${NODE_AUTH_TOKEN:?NODE_AUTH_TOKEN must be exported on the host}
 	devcontainer up --workspace-folder $(WORKSPACE)
 
 ## Run OpenCode inside the dev container (autonomous; pass ARGS="run '...'" for one-shot)
+.PHONY: opencode
 opencode: devcontainer-up
 	devcontainer exec --workspace-folder $(WORKSPACE) opencode --auto $(ARGS)
 
 ## Authenticate OpenCode with GitHub Copilot inside the isolated container volume
+.PHONY: opencode-auth-github
 opencode-auth-github: devcontainer-up
 	devcontainer exec --workspace-folder $(WORKSPACE) opencode auth login --provider github
 
 ## Run an arbitrary command inside the dev container, e.g. `make devcontainer-exec CMD="go build ./..."`
+.PHONY: devcontainer-exec
 devcontainer-exec: devcontainer-up
 	devcontainer exec --workspace-folder $(WORKSPACE) bash -lc '$(CMD)'
 
 ## Stop the dev container (data in named volumes is preserved)
+.PHONY: devcontainer-stop
 devcontainer-stop:
 	@docker stop $$(docker ps --filter "label=$(DEVCONTAINER_LABEL)" -q) 2>/dev/null || echo "not running"
 
 ## Show whether the dev container is running
+.PHONY: devcontainer-status
 devcontainer-status:
 	@docker ps -a --filter "label=$(DEVCONTAINER_LABEL)" --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}'
 
 ## Tail the dev container's logs
+.PHONY: devcontainer-logs
 devcontainer-logs:
 	@docker logs -f $$(docker ps -a --filter "label=$(DEVCONTAINER_LABEL)" -q | head -1)
 
 ## Force a full rebuild of the dev container image (config or Dockerfile changed)
+.PHONY: devcontainer-rebuild
 devcontainer-rebuild:
 	@: $${NODE_AUTH_TOKEN:?NODE_AUTH_TOKEN must be exported on the host}
 	devcontainer up --workspace-folder $(WORKSPACE) --remove-existing-container
 
 ## Remove the dev container AND its named volumes (OpenCode state, DinD state) - irreversible
+.PHONY: devcontainer-clean
 devcontainer-clean:
 	@docker stop $$(docker ps --filter "label=$(DEVCONTAINER_LABEL)" -q) 2>/dev/null || true
 	@docker rm $$(docker ps -a --filter "label=$(DEVCONTAINER_LABEL)" -q) 2>/dev/null || true
