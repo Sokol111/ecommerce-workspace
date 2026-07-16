@@ -4,6 +4,9 @@ ecommerce-admin-ui/
 # Go workspace checksum (regenerated automatically)
 go.work.sum
 
+# Browser MCP diagnostic artifacts
+.playwright-mcp/
+
 # Per-project secrets (direnv). Keep the template, ignore the real file.
 .envrc
 .env
