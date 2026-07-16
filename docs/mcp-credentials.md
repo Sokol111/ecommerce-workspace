@@ -26,7 +26,7 @@ only when OpenCode starts.
 | `grafana-cloud` | `GRAFANA_CLOUD_URL`, `GRAFANA_CLOUD_TOKEN` | host | Read-only Grafana MCP |
 | `mongodb-local` | `MDB_MCP_LOCAL_CONNECTION_STRING` | host | Database user with `read` only |
 | `mongodb-prod` | `MDB_MCP_PROD_CONNECTION_STRING` | host | Database user with `read` only |
-| `kubernetes-local` | `KUBECONFIG_MCP_LOCAL` | host | ServiceAccount bound to `view` |
+| `kubernetes-local` | `KUBECONFIG_MCP_LOCAL` | host | Local k3d admin kubeconfig |
 | `kubernetes-prod` | `KUBECONFIG_MCP_PROD` | host | ServiceAccount bound to `view` |
 | `redpanda-local` | None | host | Local unauthenticated broker on `localhost:9092` |
 | `redpanda-prod` | None | host | Local port-forward on `localhost:19092` |
@@ -140,15 +140,33 @@ URL-encode reserved characters in MongoDB usernames and passwords.
 
 ## Kubernetes
 
-Use dedicated ServiceAccounts and dedicated kubeconfig files. Do not point either MCP at an
-admin kubeconfig. The Kubernetes MCP servers also run with `--read-only`.
+Production uses a dedicated ServiceAccount and kubeconfig. Do not point production MCP at an
+admin kubeconfig; it also runs with `--read-only`.
 
 The built-in `view` ClusterRole is an appropriate baseline: it permits reading normal resources
 but deliberately excludes Secrets.
 
-### Create a viewer identity
+### Local k3d
 
-Run these commands against the target cluster. Replace `local` with `prod` for production.
+Local Kubernetes MCP intentionally has write access, so it can apply or repair local development
+resources. `make init` and `make up` generate an isolated admin kubeconfig automatically:
+
+```sh
+cd ecommerce-infrastructure/environments/local
+make init # or: make up
+```
+
+Set the resulting path once:
+
+```sh
+export KUBECONFIG_MCP_LOCAL="$HOME/.kube/mcp-local.kubeconfig"
+```
+
+`make clean` removes this generated kubeconfig. This does not grant access to production.
+
+### Production viewer identity
+
+Run these commands against the production cluster.
 
 ```sh
 kubectl create namespace mcp --dry-run=client -o yaml | kubectl apply -f -
@@ -164,20 +182,34 @@ Create a time-limited ServiceAccount token:
 TOKEN="$(kubectl -n mcp create token opencode-viewer --duration=720h)"
 ```
 
-Create a kubeconfig containing the target cluster endpoint and CA. Use the same cluster data as
-your normal kubeconfig, but write the MCP token to a separate file. For local k3d, its server is
-normally already reachable. For production, the server must be the existing SSH-tunnel endpoint
-(`https://127.0.0.1:6443`).
+Create a kubeconfig containing only the target cluster endpoint, its CA, and the MCP token. Do
+not copy your normal kubeconfig: it can contain administrator credentials. Kubernetes kubeconfigs
+usually store the CA as `certificate-authority-data`, not as a `ca.crt` file, so extract it from
+the normal kubeconfig into a temporary file first.
+
+Set `SOURCE_KUBECONFIG` to the normal production kubeconfig, `$HOME/.kube/config-hetzner`. The
+MCP kubeconfig must use the existing SSH-tunnel endpoint (`https://127.0.0.1:6443`).
 
 ```sh
-KUBECONFIG_FILE="$HOME/.kube/mcp-<environment>-viewer.kubeconfig"
-kubectl config --kubeconfig="$KUBECONFIG_FILE" set-cluster <cluster-name> \
-  --server="https://<api-server>:6443" \
-  --certificate-authority="<path-to-ca.crt>" \
+SOURCE_KUBECONFIG="$HOME/.kube/config-hetzner"
+KUBECONFIG_FILE="$HOME/.kube/mcp-prod-viewer.kubeconfig"
+CLUSTER_NAME="$(kubectl --kubeconfig="$SOURCE_KUBECONFIG" config view --raw --minify \
+  -o jsonpath='{.contexts[0].context.cluster}')"
+# Send production API requests through the SSH tunnel.
+SERVER="https://127.0.0.1:6443"
+
+CA_FILE="$(mktemp)"
+trap 'rm -f "$CA_FILE"' EXIT
+kubectl --kubeconfig="$SOURCE_KUBECONFIG" config view --raw --minify \
+  -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 --decode > "$CA_FILE"
+
+kubectl config --kubeconfig="$KUBECONFIG_FILE" set-cluster "$CLUSTER_NAME" \
+  --server="$SERVER" \
+  --certificate-authority="$CA_FILE" \
   --embed-certs=true
 kubectl config --kubeconfig="$KUBECONFIG_FILE" set-credentials opencode-viewer --token="$TOKEN"
 kubectl config --kubeconfig="$KUBECONFIG_FILE" set-context opencode-viewer \
-  --cluster=<cluster-name> --user=opencode-viewer
+  --cluster="$CLUSTER_NAME" --user=opencode-viewer
 kubectl config --kubeconfig="$KUBECONFIG_FILE" use-context opencode-viewer
 chmod 600 "$KUBECONFIG_FILE"
 ```
@@ -185,7 +217,7 @@ chmod 600 "$KUBECONFIG_FILE"
 Set the resulting paths:
 
 ```sh
-export KUBECONFIG_MCP_LOCAL="$HOME/.kube/mcp-local-viewer.kubeconfig"
+export KUBECONFIG_MCP_LOCAL="$HOME/.kube/mcp-local.kubeconfig"
 export KUBECONFIG_MCP_PROD="$HOME/.kube/mcp-prod-viewer.kubeconfig"
 ```
 
@@ -196,9 +228,10 @@ cd ecommerce-infrastructure/environments/production
 make tunnel
 ```
 
-The token in this example expires after 30 days. Regenerate the token and update the kubeconfig
-before it expires. If the cluster supports a more durable workload identity, prefer it over a
-long-lived bearer token.
+The request in this example is for a token valid for up to 30 days; the API server can enforce a
+shorter duration. Check the returned token's expiry, then regenerate the token and update the
+kubeconfig before it expires. If the cluster supports a more durable workload identity, prefer it
+over a long-lived bearer token.
 
 ## Redpanda
 

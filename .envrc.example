@@ -24,10 +24,11 @@
 #     export MDB_MCP_LOCAL_CONNECTION_STRING=""
 #     export MDB_MCP_PROD_CONNECTION_STRING=""
 #
-#     # Kubernetes MCP (host only). Point these to dedicated kubeconfigs whose
-#     # credentials are bound only to Kubernetes' built-in `view` ClusterRole.
+#     # Kubernetes MCP (host only). `make init` or `make up` generates the local
+#     # admin kubeconfig at ~/.kube/mcp-local.kubeconfig. Production must use a
+#     # dedicated kubeconfig whose credentials are bound to `view` ClusterRole.
 #     # Do not pass either kubeconfig into the devcontainer.
-#     export KUBECONFIG_MCP_LOCAL=""
+#     export KUBECONFIG_MCP_LOCAL="$HOME/.kube/mcp-local.kubeconfig"
 #     export KUBECONFIG_MCP_PROD=""
 #
 #     # npm/pnpm registry auth (read:packages only)

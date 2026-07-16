@@ -32,7 +32,7 @@
     },
     "kubernetes-local": {
       "type": "local",
-      "command": ["npx", "-y", "kubernetes-mcp-server@latest", "--read-only"],
+      "command": ["npx", "-y", "kubernetes-mcp-server@latest"],
       "environment": {
         "KUBECONFIG": "{env:KUBECONFIG_MCP_LOCAL}"
       }
