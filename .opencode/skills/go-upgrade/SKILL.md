@@ -18,17 +18,39 @@ entire workspace.
 
 ### 2. Install Go
 
-Detect how Go is currently installed with `which go`, then update it using the
-same installation method. Do not use a package manager when Go was installed
-from the official tarball.
+Detect how Go is currently installed with `which go`, then decide how to update
+it. **Do not silently install Go into a user-local directory (for example
+`$HOME/.local/go`) just to avoid privileges**: this leaves the system Go
+unchanged and breaks tools such as VS Code, which resolve `go` from the default
+`PATH` (`/usr/local/go/bin/go`).
 
-- `/usr/local/go/bin/go`: download the tarball from `https://go.dev/dl/` and
-  replace `/usr/local/go`.
+Use the same installation method that is already in place:
+
+- `/usr/local/go/bin/go`: this is the official tarball installation and lives in
+  a system directory. It requires `sudo` to replace. **Before touching
+  `/usr/local/go`, ask the user for explicit permission** and explain that it is
+  a system-wide change. If the user approves, run the standard tarball replace
+  (`rm -rf /usr/local/go && tar -C /usr/local -xzf go.tar.gz`). If the user does
+  not approve or sudo is unavailable, stop and provide exact manual commands for
+  the user to run rather than creating a local-only copy.
 - Homebrew (`/opt/homebrew/...` or `/usr/local/Cellar/...`): run `brew upgrade go`.
 - apt or snap: use the corresponding package manager.
 - goenv or asdf: use that version manager.
+- Dev container (`/workspaces/ecommerce`): the Go toolchain is usually provided
+  by the container image. Ask the user whether to update the base image /
+  devcontainer configuration instead of mutating the container filesystem.
 
-Verify the installation with `go version`.
+After any installation step, verify the default Go on `PATH` (not just inside a
+shell where `PATH` was manually overridden):
+
+```bash
+go version
+which go
+```
+
+If `go version` still reports the old version, the installation did not update
+the binary that the rest of the tooling sees. Do not continue until `go version`
+matches the target.
 
 ### 3. Update Go workspace files
 
@@ -50,15 +72,33 @@ these locally, so record the failure but do not treat it as a blocker after the
 
 ### 5. Update Dockerfiles
 
-Under `ecommerce-infrastructure/docker/`:
+Update **every** Dockerfile that references the Go toolchain in the workspace.
+There are three independent sets:
+
+1. Release build Dockerfiles in the infrastructure repo:
+   - `ecommerce-infrastructure/docker/Dockerfile.go`
+   - `ecommerce-infrastructure/docker/Dockerfile.seeder`
+   - `ecommerce-infrastructure/docker/Dockerfile.logto-seed`
+
+2. Local dev/Tilt Dockerfiles (also in the infrastructure repo):
+   - `ecommerce-infrastructure/environments/local/docker/Dockerfile.go`
+   - `ecommerce-infrastructure/environments/local/docker/Dockerfile.seeder`
+   - `ecommerce-infrastructure/environments/local/docker/Dockerfile.logto-seed`
+
+3. Dev container image (workspace root):
+   - `.devcontainer/Dockerfile`
+
+In each file:
 
 - Update every `golang:<version>` image reference.
-- Fetch the latest Delve release from
-  `https://api.github.com/repos/go-delve/delve/releases/latest`.
-- Update `go install github.com/go-delve/delve/cmd/dlv@<version>` with that
-  concrete version.
+- Update `ARG DELVE_VERSION=...` (if present) and any
+  `go install github.com/go-delve/delve/cmd/dlv@<version>` with the
+  concrete Delve version resolved below.
 
 Never replace the pinned Delve version with `@latest` in a Dockerfile.
+
+Resolve the Delve version first by fetching the latest release from
+`https://api.github.com/repos/go-delve/delve/releases/latest`.
 
 ### 6. Update GitHub workflows
 
