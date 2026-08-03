@@ -80,8 +80,9 @@ Services (Go), each paired with an `-api` contract repo:
 - `ecommerce-tenant-service` (+ `-api`) — multi-tenancy; consumed by every other service.
 
 Shared / support:
-- `ecommerce-commons` — shared Go library (`pkg/core`, `http`, `grpc`, `messaging`,
-  `observability`, `persistence`, `security`, `tenant`, `testutil`). Wired as `fx` modules.
+- `ecommerce-commons` — shared Go library (`pkg/core`, `http`, `kafka`, `mongo`,
+  `observability`, `security`, `tenant`, `testutil`). Runtime packages are wired by sibling
+  `fxconfig` packages; `pkg/fxconfig.NewCommonsModule()` aggregates the standard modules.
 - `ecommerce-infrastructure` — deployment for both environments plus shared Helm charts and
   seeders (`cmd/seeder`, `cmd/logto-seed`). `environments/local` is the local dev stack (k3d +
   Tilt + docker-compose); `environments/production` is the real deployed environment (see
@@ -106,9 +107,9 @@ service call the catalog service synchronously for data it should be projecting 
 - `internal/infrastructure/outbound/` — adapters the app drives: `mongo/` (repository impls,
   `*_entity.go` + `*_mapper.go`), `kafka/` (event producers, on catalog).
 
-**Dependency injection is `go.uber.org/fx`.** Every package exposes a `Module()` /
-`New*Module()` returning `fx.Options`. To add a component, provide it in the relevant module
-rather than constructing it manually in `main.go`.
+**Dependency injection is `go.uber.org/fx`.** `cmd/main.go` composes `fx.Options` only; it does
+not construct infrastructure components manually. In `ecommerce-commons`, Fx modules and their
+options live in sibling `fxconfig` packages, while runtime packages remain framework-agnostic.
 
 **API contracts are protobuf, generated with `buf`.** In each `*-api` repo, `proto/` holds
 `.proto` sources (service RPCs under `<name>/v1/`, Kafka event schemas under
@@ -186,13 +187,13 @@ Services are exposed via Traefik at `*.127.0.0.1.nip.io`; Tilt dashboard at `loc
   `tenant-service-api` modules are wired into every service's `main.go`. Tenant context flows
   through requests; respect it in new repository queries and handlers. Tenant-scoped data lives
   in a separate Mongo database per tenant, named `<base-db>_<tenant-slug>` (resolved per-request
-  from tenant context in `pkg/persistence/mongo/collection_provider.go`). Use
-  `mongo.NewTenantRepository` for tenant data; use `mongo.NewRepository` for collections that are
-  **not** tenant-scoped (e.g. the transactional `outbox`, which lives in the base database).
+  from tenant context). `mongo.NewGenericRepository` accepts a `mongo.CollectionProvider`; use a
+  tenant-aware provider for tenant data and `mongo.NewStaticCollectionProvider` for base-database
+  data such as the transactional `outbox`.
 - **Auth** is JWT validated against a JWKS endpoint (Logto locally). Config under `security.jwks`.
 - **Config** is YAML per service under `configs/` (e.g. `config.standalone.yaml`), overridable
   by env/`.env`. Covers `mongo`, `kafka`, `security`, `logger`, `observability`.
-- **Observability**: OpenTelemetry tracing/metrics via `commons/pkg/observability`; local
+- **Observability**: OpenTelemetry tracing/metrics via `ecommerce-commons/pkg/observability`; local
   Grafana/Prometheus/Tempo stack.
 - **Versioning**: each repo has a `VERSION` file; a service consuming an `-api` pins it as a
   normal Go module version in `go.mod`, so API changes require release-then-bump.
