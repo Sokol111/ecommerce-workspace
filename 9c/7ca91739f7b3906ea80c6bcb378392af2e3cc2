@@ -1,0 +1,23 @@
+.devcontainer/Dockerfile
+  s_2ddbc45c6930a1::t_627ad2d58c24ab 2,10
+.opencode/skills/go-upgrade/SKILL.md
+  s_2ddbc45c6930a1::t_2cd28b3dd3dc9e 21-35,39-49,51-53,75-91,94-96,100-102
+go.work
+  s_2ddbc45c6930a1::t_94b611d8a01670 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9c7ca91739f7b3906ea80c6bcb378392af2e3cc2",
+  "prompts": {},
+  "sessions": {
+    "s_2ddbc45c6930a1": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_03713463cffe3rPXYvgsb461Ql",
+        "model": "kimi-k2.7-code"
+      },
+      "human_author": "Sokol111 <igorsokol111@gmail.com>"
+    }
+  }
+}
