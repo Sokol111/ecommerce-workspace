@@ -12,39 +12,35 @@ flowchart TB
     classDef query fill:#faf5ff,color:#6b21a8,stroke:#c084fc,stroke-width:2px
     classDef data fill:#f8fafc,color:#334155,stroke:#94a3b8,stroke-width:2px
 
-    subgraph people[People]
-        direction LR
-        platformOperator[Platform operator]:::actor
-        merchant[Store owner]:::actor
-        shopper[Shopper]:::actor
+    platformOperator[Platform operator]:::actor
+    merchant[Store owner]:::actor
+    shopper[Shopper]:::actor
+
+    platformOperator ~~~ merchant
+    merchant ~~~ shopper
+
+    subgraph launch[1. Launch a store]
+        direction TB
+        platformPortal[Platform Portal<br/>platform.sokolshop.com]:::ui
+        tenant[Tenant Service<br/>provisions an isolated tenant]:::service
+        platformPortal -->|create store| tenant
     end
 
-    subgraph lifecycle[One platform, from launch to purchase]
-        direction LR
+    subgraph operate[2. Manage products]
+        direction TB
+        admin[Admin Portal<br/>admin.sokolshop.com]:::ui
+        catalog[Catalog Service<br/>products, categories, attributes]:::service
+        images[Image Service<br/>product media]:::service
+        admin -->|manage catalog| catalog
+        admin -->|upload images| images
+    end
 
-        subgraph launch[1. Launch a store]
-            direction TB
-            platformPortal[Platform Portal<br/>platform.sokolshop.com]:::ui
-            tenant[Tenant Service<br/>provisions an isolated tenant]:::service
-            platformPortal -->|create store| tenant
-        end
-
-        subgraph operate[2. Manage products]
-            direction TB
-            admin[Admin Portal<br/>admin.sokoloshop.com]:::ui
-            catalog[Catalog Service<br/>products, categories, attributes]:::service
-            images[Image Service<br/>product media]:::service
-            admin -->|manage catalog| catalog
-            admin -->|upload images| images
-        end
-
-        subgraph shop[3. Shop]
-            direction TB
-            broker[Redpanda<br/>domain event bus]:::event
-            readModels[Product and Category<br/>Query Services]:::query
-            storefront[Storefront<br/>your-store.sokolshop.com]:::ui
-            broker -->|build projections| readModels -->|fast reads| storefront
-        end
+    subgraph shop[3. Shop]
+        direction TB
+        broker[Redpanda<br/>domain event bus]:::event
+        readModels[Product and Category<br/>Query Services]:::query
+        storefront[Storefront<br/>your-store.sokolshop.com]:::ui
+        broker -->|build projections| readModels -->|fast reads| storefront
     end
 
     platformOperator --> platformPortal
