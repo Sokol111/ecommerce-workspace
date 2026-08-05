@@ -1,76 +1,66 @@
-# Platform Architecture
+# How the Platform Works
 
-This multi-tenant SaaS platform combines Go microservices, Nuxt applications, CQRS read models,
-and asynchronous domain events. Each tenant's data is isolated in its own MongoDB database while
-all tenants share the same deployment.
+The platform lets a merchant launch and operate an isolated online store while shoppers browse a
+fast, read-optimized storefront.
 
 ```mermaid
 flowchart LR
-    classDef user fill:#172554,color:#ffffff,stroke:#60a5fa,stroke-width:2px
-    classDef ui fill:#0f766e,color:#ffffff,stroke:#5eead4,stroke-width:2px
+    classDef person fill:#172554,color:#ffffff,stroke:#60a5fa,stroke-width:2px
+    classDef app fill:#0f766e,color:#ffffff,stroke:#5eead4,stroke-width:2px
     classDef write fill:#9f1239,color:#ffffff,stroke:#fda4af,stroke-width:2px
+    classDef event fill:#7c2d12,color:#ffffff,stroke:#fdba74,stroke-width:2px
     classDef read fill:#6d28d9,color:#ffffff,stroke:#c4b5fd,stroke-width:2px
-    classDef service fill:#b45309,color:#ffffff,stroke:#fcd34d,stroke-width:2px
-    classDef platform fill:#1e3a8a,color:#ffffff,stroke:#93c5fd,stroke-width:2px
-    classDef data fill:#374151,color:#ffffff,stroke:#d1d5db,stroke-width:2px
+    classDef foundation fill:#374151,color:#ffffff,stroke:#d1d5db,stroke-width:2px
 
-    shopper[Shopper]:::user
-    merchant[Store owner]:::user
-    operator[Platform operator]:::user
+    shopper[Shopper]:::person
+    merchant[Store owner]:::person
+    operator[Platform operator]:::person
 
-    subgraph experience[Customer and Management Experiences]
-        storefront[Storefront<br/>Nuxt]:::ui
-        admin[Admin Portal<br/>Nuxt]:::ui
-        platformUI[Platform Portal<br/>Nuxt]:::ui
+    subgraph setup[1. Launch a store]
+        platformUI[Platform Portal]:::app
+        tenant[Tenant Service<br/>creates an isolated tenant]:::write
+        platformUI --> tenant
     end
 
-    subgraph application[Application Services]
-        catalog[Catalog Service<br/>CQRS write side]:::write
-        productQuery[Product Query Service<br/>CQRS read side]:::read
-        categoryQuery[Category Query Service<br/>CQRS read side]:::read
-        image[Image Service<br/>upload and delivery]:::service
-        tenant[Tenant Service<br/>tenant lifecycle]:::service
+    subgraph manage[2. Manage products]
+        admin[Admin Portal]:::app
+        catalog[Catalog Service<br/>products, categories, attributes]:::write
+        image[Image Service<br/>uploads and delivery URLs]:::write
+        admin --> catalog
+        admin --> image
     end
 
-    subgraph platformServices[Platform Services]
-        events[(Redpanda<br/>domain events)]:::platform
-        mongo[(MongoDB<br/>tenant-isolated databases)]:::data
-        storage[(S3 object storage<br/>MinIO / Cloudflare R2)]:::data
-        proxy[imgproxy<br/>image transformations]:::platform
-        identity[Logto<br/>identity and JWTs]:::platform
+    subgraph sell[3. Publish a fast storefront]
+        events[Redpanda<br/>domain events]:::event
+        queries[Product and Category Query Services<br/>read-optimized product catalog]:::read
+        storefront[Storefront]:::app
+        events --> queries --> storefront
     end
 
-    shopper --> storefront
-    merchant --> admin
     operator --> platformUI
+    merchant --> admin
+    shopper --> storefront
 
-    storefront --> productQuery
-    storefront --> categoryQuery
-    admin --> catalog
-    admin --> image
-    platformUI --> tenant
-
-    catalog --> mongo
-    tenant --> mongo
-    image --> mongo
-    productQuery --> mongo
-    categoryQuery --> mongo
-
-    catalog -. domain events .-> events
-    tenant -. tenant events .-> events
-    events -. projections .-> productQuery
-    events -. projections .-> categoryQuery
-    events -. product events .-> image
+    tenant -. tenant context .-> catalog
+    tenant -. tenant context .-> image
+    tenant -. tenant context .-> queries
+    catalog -. product and category events .-> events
     image -. image events .-> events
 
-    image --> storage
-    image --> proxy
-    proxy --> storage
+    subgraph foundation[Shared platform foundation]
+        identity[Logto<br/>authentication]:::foundation
+        data[MongoDB<br/>one database per tenant]:::foundation
+        media[S3 storage and imgproxy<br/>image storage and transformation]:::foundation
+    end
 
-    storefront -. JWT validation .-> identity
-    admin -. JWT validation .-> identity
-    platformUI -. JWT validation .-> identity
+    tenant --- data
+    catalog --- data
+    image --- media
 ```
 
-**Why it matters:** Catalog writes are separated from storefront reads. Domain events build
-independent, optimized query models, allowing the storefront to scale without synchronous calls to
+**Tenant isolation:** A tenant is provisioned once and its context travels with every request.
+Tenant data is stored in a dedicated MongoDB database, while the platform remains a shared SaaS
+deployment.
+
+**Fast storefronts:** Catalog changes are published as events and projected into dedicated query
+services. Shoppers read from those optimized models rather than from the write service.
