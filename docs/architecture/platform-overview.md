@@ -4,37 +4,47 @@ The platform lets a merchant launch and operate an isolated online store while s
 fast, read-optimized storefront.
 
 ```mermaid
-flowchart LR
-    classDef person fill:#172554,color:#ffffff,stroke:#60a5fa,stroke-width:2px
-    classDef app fill:#0f766e,color:#ffffff,stroke:#5eead4,stroke-width:2px
-    classDef write fill:#9f1239,color:#ffffff,stroke:#fda4af,stroke-width:2px
-    classDef event fill:#7c2d12,color:#ffffff,stroke:#fdba74,stroke-width:2px
-    classDef read fill:#6d28d9,color:#ffffff,stroke:#c4b5fd,stroke-width:2px
-    classDef foundation fill:#374151,color:#ffffff,stroke:#d1d5db,stroke-width:2px
+flowchart TB
+    classDef person fill:#e0e7ff,color:#1e1b4b,stroke:#6366f1,stroke-width:2px
+    classDef app fill:#ccfbf1,color:#134e4a,stroke:#14b8a6,stroke-width:2px
+    classDef core fill:#dbeafe,color:#1e3a8a,stroke:#3b82f6,stroke-width:2px
+    classDef event fill:#ffedd5,color:#7c2d12,stroke:#f97316,stroke-width:2px
+    classDef read fill:#f3e8ff,color:#581c87,stroke:#a855f7,stroke-width:2px
+    classDef foundation fill:#f1f5f9,color:#334155,stroke:#94a3b8,stroke-width:2px
 
-    shopper[Shopper]:::person
-    merchant[Store owner]:::person
-    operator[Platform operator]:::person
-
-    subgraph setup[1. Launch a store]
-        platformUI[Platform Portal]:::app
-        tenant[Tenant Service<br/>creates an isolated tenant]:::write
-        platformUI --> tenant
+    subgraph people[People]
+        direction LR
+        operator[Platform operator]:::person
+        merchant[Store owner]:::person
+        shopper[Shopper]:::person
     end
 
-    subgraph manage[2. Manage products]
-        admin[Admin Portal]:::app
-        catalog[Catalog Service<br/>products, categories, attributes]:::write
-        image[Image Service<br/>uploads and delivery URLs]:::write
-        admin --> catalog
-        admin --> image
-    end
+    subgraph journey[One platform, three simple experiences]
+        direction LR
 
-    subgraph sell[3. Publish a fast storefront]
-        events[Redpanda<br/>domain events]:::event
-        queries[Product and Category Query Services<br/>read-optimized product catalog]:::read
-        storefront[Storefront]:::app
-        events --> queries --> storefront
+        subgraph setup[1. Launch a store]
+            direction TB
+            platformUI[Platform Portal]:::app
+            tenant[Tenant Service<br/>creates an isolated tenant]:::core
+            platformUI --> tenant
+        end
+
+        subgraph manage[2. Manage products]
+            direction TB
+            admin[Admin Portal]:::app
+            catalog[Catalog Service<br/>products, categories, attributes]:::core
+            image[Image Service<br/>uploads and delivery URLs]:::core
+            admin --> catalog
+            admin --> image
+        end
+
+        subgraph sell[3. Publish a fast storefront]
+            direction TB
+            events[Redpanda<br/>domain events]:::event
+            queries[Product and Category Query Services<br/>read-optimized product catalog]:::read
+            storefront[Storefront]:::app
+            events --> queries --> storefront
+        end
     end
 
     operator --> platformUI
@@ -48,11 +58,15 @@ flowchart LR
     image -. image events .-> events
 
     subgraph foundation[Shared platform foundation]
+        direction LR
         identity[Logto<br/>authentication]:::foundation
         data[MongoDB<br/>one database per tenant]:::foundation
         media[S3 storage and imgproxy<br/>image storage and transformation]:::foundation
     end
 
+    identity -.- platformUI
+    identity -.- admin
+    identity -.- storefront
     tenant --- data
     catalog --- data
     image --- media
