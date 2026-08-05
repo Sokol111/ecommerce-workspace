@@ -73,8 +73,8 @@ See [`AGENTS.md`](AGENTS.md) for the full architecture deep-dive.
 
 ## Architecture diagrams
 
-- [How the Platform Works](docs/architecture/platform-overview.md) — portfolio-level overview of
-  tenant provisioning, catalog management, and the event-driven storefront.
+- [Store Lifecycle](docs/architecture/platform-overview.md) — portfolio-level overview of tenant
+  provisioning, catalog management, and the event-driven storefront.
 - [Product Update Flow](docs/architecture/product-update-flow.md) — reliable product propagation
   from a catalog write through the transactional outbox to the storefront read model.
 
