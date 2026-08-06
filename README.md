@@ -66,7 +66,7 @@ Kafka event schemas under `<name>/events/v1/`, with generated Go and TypeScript 
 - **Multi-tenant SaaS.** Self-service sign-up provisions a new store per tenant. Tenancy is
   pervasive — tenant context flows through every request, and each tenant's data is isolated in
   its own dedicated database (named with the tenant slug, `*_<tenant-slug>`).
-- **Auth** is JWT validated against a JWKS endpoint (Logto locally).
+- **Auth** is JWT validated against a JWKS endpoint (Logto).
 - **Observability** via OpenTelemetry (local Grafana/Prometheus/Tempo stack).
 
 See [`AGENTS.md`](AGENTS.md) for the full architecture deep-dive.

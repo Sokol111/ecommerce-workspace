@@ -190,7 +190,7 @@ Services are exposed via Traefik at `*.127.0.0.1.nip.io`; Tilt dashboard at `loc
   from tenant context). `mongo.NewGenericRepository` accepts a `mongo.CollectionProvider`; use a
   tenant-aware provider for tenant data and `mongo.NewStaticCollectionProvider` for base-database
   data such as the transactional `outbox`.
-- **Auth** is JWT validated against a JWKS endpoint (Logto locally). Config under `security.jwks`.
+- **Auth** is JWT validated against a JWKS endpoint (Logto). Config under `security.jwks`.
 - **Config** is YAML per service under `configs/` (e.g. `config.standalone.yaml`), overridable
   by env/`.env`. Covers `mongo`, `kafka`, `security`, `logger`, `observability`.
 - **Observability**: OpenTelemetry tracing/metrics via `ecommerce-commons/pkg/observability`; local
